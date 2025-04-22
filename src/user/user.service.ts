@@ -7,6 +7,24 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UserService {
     constructor(private JwtService: JwtService){}
+
+    async addCredential (id: number, empresa: number) {
+        const sql = `INSERT INTO public.glpi_sexp_user_empresa
+        (empresa_id, user_id) VALUES(${empresa}, ${id});`
+        const conn = clientReturner()
+        await conn.connect()
+        await conn.query(sql)
+        await conn.end()
+        return 'Credenciales modificadas.'
+    }
+    async deleteCredential (id: number){
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `DELETE FROM public.glpi_sexp_user_empresa WHERE user_empresa_id=${id};`
+        await conn.query(sql)
+        await conn.end()
+        return 'Credencial eliminada.'
+    }
     async getAll () {
         const conn = clientReturner()
         await conn.connect()

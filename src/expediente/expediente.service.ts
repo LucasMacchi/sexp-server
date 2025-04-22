@@ -1,20 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import expedienteDto from 'src/Dtos/expedienteDto';
+import modexpDto from 'src/Dtos/modexpDto';
 import clientReturner from 'src/utils/clientReturner';
 
 @Injectable()
 export class ExpedienteService {
 
+    async editExpediente (id: number, data: modexpDto) {
+        const conn = clientReturner()
+        await conn.connect()
+        const editEstado = `UPDATE public.glpi_sexp_expediente SET estado_id=${data.estado_id} WHERE exp_id = ${id};`
+        const editFecha = `UPDATE public.glpi_sexp_expediente SET fecha_ult_mod='${data.ultima_mod}' WHERE exp_id = ${id};`
+        const editDes = `UPDATE public.glpi_sexp_expediente SET descripcion='${data.descripcion}' WHERE exp_id = ${id};`
+        if(data.estado_id) await conn.query(editEstado)
+        if(data.ultima_mod) await conn.query(editFecha)
+        if(data.descripcion) await conn.query(editDes)
+        await conn.end()
+        return `Expediente actualizado.`
+    }
+    async getExpedientes () {
+        const sql = `SELECT * FROM public.glpi_sexp_expediente;`
+        const conn = clientReturner()
+        await conn.connect()
+        const exps = (await conn.query(sql)).rows
+        await conn.end()
+        return exps
+    }
     async createExpediente (exp: expedienteDto){
-        let des = ``
+        const adddes = `, '${exp.descripcion}'`
         const sql = `INSERT INTO public.glpi_sexp_expediente
         (service_id,user_id, numero_exp, concepto, periodo, 
         fecha_presentacion, fecha_ult_mod, nro_factura, 
-        empresa_id, estado_id, importe, descripcion)
+        empresa_id, estado_id, importe${exp.descripcion && ', descripcion'})
         VALUES(${exp.servicio_id},${exp.user_id} , '${exp.numero_exp}', 
         '${exp.concepto}', '${exp.periodo}', '${exp.fecha_presentacion}', 
         '${exp.fecha_presentacion}', '${exp.nro_factura}', ${exp.empresa_id},
-         ${exp.estado_id}, ${exp.importe}, '${exp.descripcion}');`
+         ${exp.estado_id}, ${exp.importe}${adddes});`
         
         const conn = clientReturner()
         await conn.connect()

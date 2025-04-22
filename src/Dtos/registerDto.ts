@@ -1,10 +1,5 @@
 import { IsNotEmpty, IsString, IsBoolean, IsEmail, IsArray, IsNumber } from "class-validator";
 
-export interface IEmpresasServicios {
-    empresa_id: number,
-    servicio_id: number
-}
-
 export default class registerDto {
 
     @IsString()

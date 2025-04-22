@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Get, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import loginDto from 'src/Dtos/loginDto';
 import registerDto from 'src/Dtos/registerDto';
@@ -26,5 +26,13 @@ export class UserController {
     @Patch('deactivate/:user')
     async deactivateUser (@Param('user') user: number) {
         return await this.userService.deactivateU(user)
+    }
+    @Post('credential/:user/:empresa')
+    async addCredentials (@Param('user') user: number, @Param('empresa') empresa: number) {
+        return await this.userService.addCredential(user, empresa)
+    }
+    @Delete('credential/:id')
+    async delCredentials (@Param('id') id: number) {
+        return this.userService.deleteCredential(id)
     }
 }
