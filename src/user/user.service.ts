@@ -1,13 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import loginDto from 'src/Dtos/loginDto';
 import registerDto from 'src/Dtos/registerDto';
 import clientReturner from 'src/utils/clientReturner';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-
+    constructor(private JwtService: JwtService){}
+    async getAll () {
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `SELECT * FROM public.glpi_sexp_users;`
+        const sql2 = `SELECT * FROM public.glpi_sexp_user_empresa;`
+        const users = (await conn.query(sql)).rows
+        const credentials = (await conn.query(sql2)).rows
+        users.forEach(u => {
+            const arr = credentials.filter((c) => u['user_id'] === c['user_id'])
+            u['credentials'] = arr
+        });
+        await conn.end()
+        return users
+    }
     async login(data: loginDto) {
-        return 'User '+data.email+' logged'
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `SELECT user_id, email, activated, "admin" FROM public.glpi_sexp_users WHERE email = '${data.email}';`
+        const rows = await conn.query(sql)
+        await conn.end()
+        const userData = rows.rows[0]
+        if(userData && userData['activated']){
+            return this.JwtService.sign(userData)
+        }
+        else {
+            throw UnauthorizedException
+        }
     }
     async register(data: registerDto) {
         const conn = clientReturner()

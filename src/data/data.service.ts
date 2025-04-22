@@ -3,6 +3,14 @@ import clientReturner from 'src/utils/clientReturner';
 
 @Injectable()
 export class DataService {
+    async getterData (table: string) {
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `SELECT * FROM public.${table};`
+        const result = (await conn.query(sql)).rows
+        await conn.end()
+        return result
+    }
     async addService (service: string) {
         const conn = clientReturner()
         await conn.connect()

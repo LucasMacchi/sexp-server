@@ -7,6 +7,10 @@ export default class expedienteDto {
 
     @IsNumber()
     @IsNotEmpty()
+    user_id:number
+
+    @IsNumber()
+    @IsNotEmpty()
     empresa_id: number
 
     @IsNumber()
@@ -38,7 +42,6 @@ export default class expedienteDto {
     nro_factura: string
 
     @IsString()
-    @IsNotEmpty()
     descripcion: string
 }
 
