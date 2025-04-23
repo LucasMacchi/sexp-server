@@ -44,8 +44,11 @@ export class UserService {
         await conn.connect()
         const sql = `SELECT user_id, email, activated, "admin" FROM public.glpi_sexp_users WHERE email = '${data.email}';`
         const rows = await conn.query(sql)
-        await conn.end()
         const userData = rows.rows[0]
+        const sql2 = `SELECT * FROM public.glpi_sexp_user_empresa WHERE user_id = ${userData['user_id']};`
+        const credentials = (await conn.query(sql2)).rows
+        userData['credentials'] = credentials
+        await conn.end()
         if(userData && userData['activated']){
             return this.JwtService.sign(userData)
         }
