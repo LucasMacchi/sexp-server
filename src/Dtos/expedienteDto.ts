@@ -18,7 +18,6 @@ export default class expedienteDto {
     estado_id: number
 
     @IsNumber()
-    @IsNotEmpty()
     importe: number
 
     @IsString()
@@ -38,7 +37,6 @@ export default class expedienteDto {
     fecha_presentacion: string
 
     @IsString()
-    @IsNotEmpty()
     nro_factura: string
 
     @IsString()

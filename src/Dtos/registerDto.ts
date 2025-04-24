@@ -17,8 +17,4 @@ export default class registerDto {
     @IsBoolean()
     @IsNotEmpty()
     admin: boolean
-
-    @IsArray()
-    @IsNotEmpty()
-    permisos: number[]
 }

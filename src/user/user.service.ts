@@ -62,19 +62,8 @@ export class UserService {
         const sql = `INSERT INTO public.glpi_sexp_users
         (first_name, last_name, email, activated, "admin", date_activated)
         VALUES('${data.first_name}', '${data.last_name}', '${data.email}', false, ${data.admin}, NOW()) RETURNING user_id;`
-        const rows = await conn.query(sql)
-        const user_id = rows.rows[0]['user_id']
-        data.permisos.forEach( async (e) => {
-            const sql2 = `INSERT INTO public.glpi_sexp_user_empresa
-            (empresa_id, user_id)
-            VALUES(${e}, ${user_id});`
-            await conn.query(sql2)
-        });
-
-        setTimeout(() => {
-            conn.end()
-        }, 500);
-        
+        await conn.query(sql)
+        await conn.end()
         return 'Usuario creado: '+data.email
     }
     async activateU (id: number) {

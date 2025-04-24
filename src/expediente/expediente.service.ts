@@ -9,9 +9,15 @@ export class ExpedienteService {
     async editExpediente (id: number, data: modexpDto) {
         const conn = clientReturner()
         await conn.connect()
+        const editImporte = `UPDATE public.glpi_sexp_expediente SET importe=${data.importe} WHERE exp_id = ${id};`
+        const editNroExp = `UPDATE public.glpi_sexp_expediente SET numero_exp='${data.numero_exp}' WHERE exp_id = ${id};`
+        const editNroF = `UPDATE public.glpi_sexp_expediente SET nro_factura='${data.nro_factura}' WHERE exp_id = ${id};`
         const editEstado = `UPDATE public.glpi_sexp_expediente SET estado_id=${data.estado_id} WHERE exp_id = ${id};`
         const editFecha = `UPDATE public.glpi_sexp_expediente SET fecha_ult_mod='${data.ultima_mod}' WHERE exp_id = ${id};`
         const editDes = `UPDATE public.glpi_sexp_expediente SET descripcion='${data.descripcion}' WHERE exp_id = ${id};`
+        if(data.importe) await conn.query(editImporte)
+        if(data.nro_factura) await conn.query(editNroF)
+        if(data.numero_exp) await conn.query(editNroExp)
         if(data.estado_id) await conn.query(editEstado)
         if(data.ultima_mod) await conn.query(editFecha)
         if(data.descripcion) await conn.query(editDes)

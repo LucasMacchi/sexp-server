@@ -9,4 +9,13 @@ export default class modexpDto {
 
     @IsString()
     descripcion: string
+
+    @IsNumber()
+    importe: number
+
+    @IsString()
+    numero_exp: string
+
+    @IsString()
+    nro_factura: string
 }
