@@ -1,4 +1,4 @@
-import {IsString, IsNumber } from "class-validator";
+import {IsString, IsNumber, IsBoolean } from "class-validator";
 
 export default class modexpDto {
     @IsString()
@@ -18,4 +18,10 @@ export default class modexpDto {
 
     @IsString()
     nro_factura: string
+
+    @IsBoolean()
+    invitacion: boolean
+
+    @IsBoolean()
+    orden_compra: boolean
 }
