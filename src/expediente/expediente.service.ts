@@ -9,12 +9,16 @@ export class ExpedienteService {
     async editExpediente (id: number, data: modexpDto) {
         const conn = clientReturner()
         await conn.connect()
+        const editInv = `UPDATE public.glpi_sexp_expediente SET invitacion='${data.invitacion}' WHERE exp_id = ${id};`
+        const editOrdenC = `UPDATE public.glpi_sexp_expediente SET orden_compra='${data.orden_compra}' WHERE exp_id = ${id};`
         const editImporte = `UPDATE public.glpi_sexp_expediente SET importe=${data.importe} WHERE exp_id = ${id};`
         const editNroExp = `UPDATE public.glpi_sexp_expediente SET numero_exp='${data.numero_exp}' WHERE exp_id = ${id};`
         const editNroF = `UPDATE public.glpi_sexp_expediente SET nro_factura='${data.nro_factura}' WHERE exp_id = ${id};`
         const editEstado = `UPDATE public.glpi_sexp_expediente SET estado_id=${data.estado_id} WHERE exp_id = ${id};`
         const editFecha = `UPDATE public.glpi_sexp_expediente SET fecha_ult_mod='${data.ultima_mod}' WHERE exp_id = ${id};`
         const editDes = `UPDATE public.glpi_sexp_expediente SET descripcion='${data.descripcion}' WHERE exp_id = ${id};`
+        await conn.query(editInv)
+        await conn.query(editOrdenC)
         if(data.importe) await conn.query(editImporte)
         if(data.nro_factura) await conn.query(editNroF)
         if(data.numero_exp) await conn.query(editNroExp)

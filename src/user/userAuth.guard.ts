@@ -6,8 +6,7 @@ import {
   } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config'
 
 const secret = process.env.TOKEN_SECRET ?? undefined
 
