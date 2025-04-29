@@ -1,11 +1,20 @@
 import { Controller, Post, Body, Patch, Param, Get, UseGuards } from '@nestjs/common';
 import { DataService } from './data.service';
 import { userGuard } from 'src/user/userAuth.guard';
-
+import types from '../jsons/types.json'
+import deparments from "../jsons/department.json"
 @Controller('data')
 export class DataController {
     constructor(private dataService: DataService) {}
 
+    @Get('tipos')
+    async getTypes () {
+        return types
+    }
+    @Get('ubicaciones')
+    async getDeparments () {
+        return deparments
+    }
     @UseGuards(userGuard)
     @Get('services')
     async getServices () {
