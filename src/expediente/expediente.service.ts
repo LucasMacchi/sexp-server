@@ -9,6 +9,7 @@ export class ExpedienteService {
     async editExpediente (id: number, data: modexpDto) {
         const conn = clientReturner()
         await conn.connect()
+        const editUbi = `UPDATE public.glpi_sexp_expediente SET ubicacion='${data.ubicacion}' WHERE exp_id = ${id};`
         const editInv = `UPDATE public.glpi_sexp_expediente SET invitacion='${data.invitacion}' WHERE exp_id = ${id};`
         const editOrdenC = `UPDATE public.glpi_sexp_expediente SET orden_compra='${data.orden_compra}' WHERE exp_id = ${id};`
         const editImporte = `UPDATE public.glpi_sexp_expediente SET importe=${data.importe} WHERE exp_id = ${id};`
@@ -17,8 +18,11 @@ export class ExpedienteService {
         const editEstado = `UPDATE public.glpi_sexp_expediente SET estado_id=${data.estado_id} WHERE exp_id = ${id};`
         const editFecha = `UPDATE public.glpi_sexp_expediente SET fecha_ult_mod='${data.ultima_mod}' WHERE exp_id = ${id};`
         const editDes = `UPDATE public.glpi_sexp_expediente SET descripcion='${data.descripcion}' WHERE exp_id = ${id};`
+        const editFechaFacturacion = `UPDATE public.glpi_sexp_expediente SET fecha_facturacion='${data.fecha_facturacion}' WHERE exp_id = ${id};`
         await conn.query(editInv)
         await conn.query(editOrdenC)
+        if(data.fecha_facturacion) await conn.query(editFechaFacturacion)
+        if(data.ubicacion) await conn.query(editUbi)
         if(data.importe) await conn.query(editImporte)
         if(data.nro_factura) await conn.query(editNroF)
         if(data.numero_exp) await conn.query(editNroExp)
