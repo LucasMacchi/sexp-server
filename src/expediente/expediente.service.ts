@@ -19,8 +19,10 @@ export class ExpedienteService {
         const editFecha = `UPDATE public.glpi_sexp_expediente SET fecha_ult_mod='${data.ultima_mod}' WHERE exp_id = ${id};`
         const editDes = `UPDATE public.glpi_sexp_expediente SET descripcion='${data.descripcion}' WHERE exp_id = ${id};`
         const editFechaFacturacion = `UPDATE public.glpi_sexp_expediente SET fecha_facturacion='${data.fecha_facturacion}' WHERE exp_id = ${id};`
+        const editFechaTesoreria = `UPDATE public.glpi_sexp_expediente SET fecha_tesoreria='${data.fecha_tesoreria}' WHERE exp_id = ${id};`
         await conn.query(editInv)
         await conn.query(editOrdenC)
+        if(data.fecha_tesoreria) await conn.query(editFechaTesoreria)
         if(data.fecha_facturacion) await conn.query(editFechaFacturacion)
         if(data.ubicacion) await conn.query(editUbi)
         if(data.importe) await conn.query(editImporte)
