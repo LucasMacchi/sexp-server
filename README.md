@@ -2,7 +2,7 @@
 
 # SISTEMA DE GESTION DE PEDIDOS
 
-Este es el servidor de la aplicacion de seguimiento de expedientes, dieñado para INSUDENT, SAMAB y SOLUCIONES & SERVICIOS.
+Este es el servidor de la aplicacion de seguimiento de expedientes, dieñado para INSUDENT, SAMABE y SOLUCIONES & SERVICIOS.
 Este se encarga de la comunicacion entre la aplicacion y la base de datos postgresql, siguiendo un esquema de API y rutas.
 Las rutas estan portegidas por un token que lo autentica.
 
