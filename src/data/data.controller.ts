@@ -6,11 +6,13 @@ import deparments from "../jsons/department.json"
 @Controller('data')
 export class DataController {
     constructor(private dataService: DataService) {}
-
+    
+    @UseGuards(userGuard)
     @Get('tipos')
     async getTypes () {
         return types
     }
+    @UseGuards(userGuard)
     @Get('ubicaciones')
     async getDeparments () {
         return deparments
