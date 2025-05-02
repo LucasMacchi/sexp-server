@@ -34,6 +34,14 @@ export default class expedienteDto {
 
     @IsString()
     @IsNotEmpty()
+    tipo: string
+
+    @IsString()
+    @IsNotEmpty()
+    ubicacion: string
+
+    @IsString()
+    @IsNotEmpty()
     fecha_presentacion: string
 
     @IsString()
