@@ -2,7 +2,6 @@ import { Controller, Post, Body, Patch, Param, Get, UseGuards } from '@nestjs/co
 import { DataService } from './data.service';
 import { userGuard } from 'src/user/userAuth.guard';
 import types from '../jsons/types.json'
-import deparments from "../jsons/department.json"
 @Controller('data')
 export class DataController {
     constructor(private dataService: DataService) {}
@@ -11,11 +10,6 @@ export class DataController {
     @Get('tipos')
     async getTypes () {
         return types
-    }
-    @UseGuards(userGuard)
-    @Get('ubicaciones')
-    async getDeparments () {
-        return deparments
     }
     @UseGuards(userGuard)
     @Get('services')

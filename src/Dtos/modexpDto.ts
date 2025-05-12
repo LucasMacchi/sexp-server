@@ -26,9 +26,6 @@ export default class modexpDto {
     orden_compra: boolean
 
     @IsString()
-    ubicacion: string
-
-    @IsString()
     fecha_facturacion: string
     
     @IsString()
