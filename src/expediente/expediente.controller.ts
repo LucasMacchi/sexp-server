@@ -20,8 +20,7 @@ export class ExpedienteController {
     }
     @UseGuards(userGuard)
     @Patch('edit/:id')
-    async editExp (@Param('id') id: number,
-    @Body() data: modexpDto) {
-        return await this.expService.editExpediente(id, data)
+    async editExp (@Param('id') id: number, @Body() data: modexpDto) {
+      return await this.expService.editExpediente(id, data)
     }
 }
