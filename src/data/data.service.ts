@@ -6,6 +6,7 @@ export class DataService {
     async getterData (table: string) {
         const conn = clientReturner()
         await conn.connect()
+
         const sql = `SELECT * FROM public.${table};`
         const result = (await conn.query(sql)).rows
         await conn.end()
