@@ -30,4 +30,7 @@ export default class modexpDto {
     
     @IsString()
     fecha_tesoreria: string
+    
+    @IsString()
+    concepto: string
 }
