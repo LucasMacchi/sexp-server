@@ -14,6 +14,16 @@ export class ExpedienteController {
         return await this.expService.getExpedientes()
     }
     @UseGuards(userGuard)
+    @Get("uniq/:id")
+    async getUniqExp (@Param('id') id: number) {
+        return await this.expService.getUniqExpediente(id)
+    }
+    @UseGuards(userGuard)
+    @Get("number/:nro")
+    async getUniqExpNro (@Param('nro') nro: string) {
+        return await this.expService.getByNro(nro)
+    }
+    @UseGuards(userGuard)
     @Post('add')
     async createExp (@Body() exp: expedienteDto) {
         return await this.expService.createExpediente(exp)

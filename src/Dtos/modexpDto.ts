@@ -1,36 +1,11 @@
-import {IsString, IsNumber, IsBoolean } from "class-validator";
+import {IsString, IsNotEmpty } from "class-validator";
 
 export default class modexpDto {
     @IsString()
-    ultima_mod: string
-
-    @IsNumber()
-    estado_id: number
+    @IsNotEmpty()
+    prop: string
 
     @IsString()
-    descripcion: string
-
-    @IsNumber()
-    importe: number
-
-    @IsString()
-    numero_exp: string
-
-    @IsString()
-    nro_factura: string
-
-    @IsBoolean()
-    invitacion: boolean
-
-    @IsBoolean()
-    orden_compra: boolean
-
-    @IsString()
-    fecha_facturacion: string
-    
-    @IsString()
-    fecha_tesoreria: string
-    
-    @IsString()
-    concepto: string
+    @IsNotEmpty()
+    value: string
 }
