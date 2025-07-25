@@ -10,7 +10,7 @@ export default class registerDto {
     @IsNotEmpty()
     last_name: string
 
-    @IsEmail()
+    @IsString()
     @IsNotEmpty()
     email: string
 
