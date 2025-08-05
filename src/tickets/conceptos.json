@@ -1,0 +1,16 @@
+{
+    "conceptos": [
+        {
+            "concepto_cod": "INSLIM21%",
+            "concepto_des": "Insumos de Limpieza 21%"
+        },
+        {
+            "concepto_cod": "INSMANT21%",
+            "concepto_des": "Insumos de Mantenimiento 21%"
+        },
+        {
+            "concepto_cod": "COMB21%",
+            "concepto_des": "Combustible 21%"
+        }
+    ]
+}
