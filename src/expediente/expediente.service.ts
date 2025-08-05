@@ -16,7 +16,7 @@ export class ExpedienteService {
         return `Expediente actualizado.`
     }
     async getExpedientes () {
-        const sql = `SELECT * FROM public.glpi_sexp_expediente;`
+        const sql = `SELECT * FROM public.glpi_sexp_expediente order by fecha_presentacion DESC;;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows

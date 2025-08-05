@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Get } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import addTicketDto from 'src/Dtos/addTicketDto';
+import txtdataDto from 'src/Dtos/txtdataDto';
 
 @Controller('tickets')
 export class TicketsController {
@@ -21,8 +22,13 @@ export class TicketsController {
         return this.tckService.getConceptos()
     }
 
-    @Get('txt')
-    async getTxt () {
-        return this.tckService.createTxt()
+    @Post('txt')
+    async getTxt (@Body() data: txtdataDto) {
+        return this.tckService.createTxt(data)
+    }
+
+    @Get('latest')
+    async getLatestTickets () {
+        return this.tckService.getTickets()
     }
 }

@@ -3,6 +3,7 @@ import addTicketDto from 'src/Dtos/addTicketDto';
 import clientReturner from 'src/utils/clientReturner';
 import conceptos from "./conceptos.json"
 import * as fs from 'fs';
+import txtdataDto from 'src/Dtos/txtdataDto';
 
 
 interface ITicket {
@@ -34,11 +35,12 @@ export class TicketsService {
         const fechaParsed = data.fecha.replaceAll("-","")
         const sql = `INSERT INTO public.glpi_sexp_ticket
         (comprobante, tipo, pv, nro, prov_cuit, prov_name, neto, ivapor, iva, total, concepto,
-        prov_cod, provsiv_cod, proprv_cod, concepto_cod, fecha)
+        prov_cod, provsiv_cod, proprv_cod, concepto_cod, fecha, fecha_created, exported)
         VALUES('${data.comprobante}', '${data.tipo}', '${data.pv}', '${data.nro}', 
         '${data.prov_cuit}', '${data.prov_name}', ${data.neto}, 
         ${data.ivapor}, ${data.iva}, ${data.total}, '${data.concepto}', ${data.prov_cod},
-        ${data.provsiv_cod},${data.proprv_codigo}, '${data.concepto_cod}', '${fechaParsed}');`
+        ${data.provsiv_cod},${data.proprv_codigo}, '${data.concepto_cod}', '${fechaParsed}',
+        NOW(), false);`
         await conn.query(sql)
         await conn.end()
         return `Ticker creado.`
@@ -57,17 +59,26 @@ export class TicketsService {
         return conceptos.conceptos
     }
 
-    async createTxt () {
+    async getTickets () {
         const conn = clientReturner()
         await conn.connect()
-        const cco = 11123
-        const rows:ITicket[] = (await conn.query(`SELECT * FROM public.glpi_sexp_ticket;`)).rows
+        const sql = "select * from glpi_sexp_ticket g where g.exported = false order by g.fecha_created desc limit 15;"
+        const rows = (await conn.query(sql)).rows
+        await conn.end()
+        return rows
+    }
+
+    async createTxt (data: txtdataDto) {
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `SELECT * FROM public.glpi_sexp_ticket t where t.fecha >= '${data.fechaInicio}' and t.fecha <= '${data.fechaFin}' and t.exported = false;`
+        const rows:ITicket[] = (await conn.query(sql)).rows
         const itemsArray: string[] = this.createItemTxt(rows)
         const txt = {
             cabecera: this.createCabeceraTxt(rows),
             items: this.createItemTxt(rows),
             medpago: this.createMedPagosTxt(rows),
-            cco: this.createCcoTxt(rows, cco)
+            cco: this.createCcoTxt(rows, data.cco)
         }
         return txt
 
@@ -109,6 +120,18 @@ export class TicketsService {
         return newCuit
     }
 
+    private dateParser (tDate: Date): string {
+        const day = tDate.getUTCDate()
+        let dayStr = day.toString()
+        const month = tDate.getUTCMonth() + 1
+        let mStr = month.toString()
+        const year = tDate.getUTCFullYear()
+        const yStr = year.toString()
+        if(day < 10) dayStr = "0"+dayStr
+        if(month < 10) mStr = "0"+mStr
+        return year+mStr+dayStr
+    }
+
     private createCabeceraTxt (tickets: ITicket[]) {
         let cabeceraLines: string[] = []
         const blank1 = [15,15,8,8,8,8,8,8,4,25,1,15,8,1,4,4,15,15,1,1,8,3,3,8,8,6]
@@ -116,6 +139,7 @@ export class TicketsService {
         for (let index = 0; index < lines; index++) {
             let line = ""
             const t = tickets[index]
+            t.fecha = this.dateParser(new Date(t.fecha))
             //Comprobante
             line += this.fillEmpty(t.comprobante,3,false,false,true)
             //Letra
@@ -178,11 +202,12 @@ export class TicketsService {
 
     private createItemTxt (tickets: ITicket[]) {
         let itemLines: string[] = []
-        const blank = [3,4,25,4,25,6,40,15,15,15,20,8,20,50,8,3]
+        const blank = [3,4,25,4,25,6,40,15,15,15,20,8,20,50,8]
         const lines = tickets.length
         for (let index = 0; index < lines; index++) {
             let line = ""
             const t = tickets[index]
+            //t.fecha = this.dateParser(new Date(t.fecha))
             //Comprobante
             line += this.fillEmpty(t.comprobante,3,false,false,true)
             //Letra
@@ -246,6 +271,7 @@ export class TicketsService {
             blank.forEach((s) => {
                 line += this.fillEmpty("",s,true,true,false)    
             });
+            line += this.fillEmpty("1",3,false,false,false)    
             itemLines.push(line)
         }
         return itemLines
@@ -257,6 +283,7 @@ export class TicketsService {
         for (let index = 0; index < lines; index++) {
             let line = ""
             const t = tickets[index]
+            //t.fecha = this.dateParser(new Date(t.fecha))
             //Comprobante
             line += this.fillEmpty(t.comprobante,3,false,false,true)
             //Letra
@@ -306,12 +333,13 @@ export class TicketsService {
         }
         return itemLines
     }
-    private createCcoTxt (tickets: ITicket[], cco: number) {
+    private createCcoTxt (tickets: ITicket[], cco: string) {
         let itemLines: string[] = []
         const lines = tickets.length
         for (let index = 0; index < lines; index++) {
             let line = ""
             const t = tickets[index]
+            //t.fecha = this.dateParser(new Date(t.fecha))
             //Comprobante
             line += this.fillEmpty(t.comprobante,3,false,false,true)
             //Letra
@@ -327,13 +355,13 @@ export class TicketsService {
             //cod prov
             line += this.fillEmpty(t.prov_cod.toString(),6,false,false,true)
             //Nro de renglon
-            line += this.fillEmpty("",3,true,false,false)
+            line += this.fillEmpty("1",3,false,false,false)
             //cco
             line += this.fillEmpty(cco.toString(),8,false,false,false)
             //porncentaje
-            line += this.fillEmpty("100%",16,false,false,false)
+            line += this.fillEmpty("100.00",16,false,false,false)
             //porncentaje
-            line += this.fillEmpty(t.total.toString(),16,false,false,false)
+            line += this.fillEmpty(t.neto.toString(),16,false,false,false)
 
             itemLines.push(line)
         }
