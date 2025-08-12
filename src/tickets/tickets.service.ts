@@ -71,9 +71,9 @@ export class TicketsService {
     async createTxt (data: txtdataDto) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `SELECT * FROM public.glpi_sexp_ticket t where t.fecha >= '${data.fechaInicio}' and t.fecha <= '${data.fechaFin}' and t.exported = false;`
+        const sql = `update public.glpi_sexp_ticket t set exported = true where t.fecha >= '${data.fechaInicio}' and t.fecha <= '${data.fechaFin}' and t.exported = false returning *;`
         const rows:ITicket[] = (await conn.query(sql)).rows
-        const itemsArray: string[] = this.createItemTxt(rows)
+        console.log(sql, rows)
         const txt = {
             cabecera: this.createCabeceraTxt(rows),
             items: this.createItemTxt(rows),
