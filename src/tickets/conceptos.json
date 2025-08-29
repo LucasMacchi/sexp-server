@@ -2,15 +2,28 @@
     "conceptos": [
         {
             "concepto_cod": "INSLIM21%",
-            "concepto_des": "Insumos de Limpieza 21%"
+            "concepto_des": "Insumos de Limpieza 21%",
+            "concepto_iva": 21
         },
         {
             "concepto_cod": "INSMANT21%",
-            "concepto_des": "Insumos de Mantenimiento 21%"
+            "concepto_des": "Insumos de Mantenimiento 21%",
+            "concepto_iva": 21
         },
         {
             "concepto_cod": "COMB21%",
-            "concepto_des": "Combustible 21%"
+            "concepto_des": "Combustible 21%",
+            "concepto_iva": 21
+        },
+        {
+            "concepto_cod": "INSRACIO10,5%",
+            "concepto_des": "Insumos de Racionamiento 10,5%",
+            "concepto_iva": 10.5
+        },
+        {
+            "concepto_cod": "INSRACIO21%",
+            "concepto_des": "Insumos de Racionamiento 21%",
+            "concepto_iva": 10.5
         }
     ]
 }
