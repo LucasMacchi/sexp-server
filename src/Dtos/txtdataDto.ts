@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
 
 export default class {
     @IsString()
@@ -12,4 +12,8 @@ export default class {
     @IsString()
     @IsNotEmpty()
     cco: string
+
+    @IsBoolean()
+    @IsNotEmpty()
+    samabe: boolean
 }
