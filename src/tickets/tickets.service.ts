@@ -35,12 +35,12 @@ export class TicketsService {
         const fechaParsed = data.fecha.replaceAll("-","")
         const sql = `INSERT INTO public.glpi_sexp_ticket
         (comprobante, tipo, pv, nro, prov_cuit, prov_name, neto, ivapor, iva, total, concepto,
-        prov_cod, provsiv_cod, proprv_cod, concepto_cod, fecha, fecha_created, exported)
+        prov_cod, provsiv_cod, proprv_cod, concepto_cod, fecha, fecha_created, exported, samabe)
         VALUES('${data.comprobante}', '${data.tipo}', '${data.pv}', '${data.nro}', 
         '${data.prov_cuit}', '${data.prov_name}', ${data.neto}, 
         ${data.ivapor}, ${data.iva}, ${data.total}, '${data.concepto}', ${data.prov_cod},
         ${data.provsiv_cod},${data.proprv_codigo}, '${data.concepto_cod}', '${fechaParsed}',
-        NOW(), false);`
+        NOW(), false, ${data.samabe});`
         await conn.query(sql)
         await conn.end()
         return `Ticker creado.`
@@ -71,7 +71,7 @@ export class TicketsService {
     async createTxt (data: txtdataDto) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `update public.glpi_sexp_ticket t set exported = true where t.fecha >= '${data.fechaInicio}' and t.fecha <= '${data.fechaFin}' and t.exported = false returning *;`
+        const sql = `update public.glpi_sexp_ticket t set exported = true where t.fecha >= '${data.fechaInicio}' and t.fecha <= '${data.fechaFin}' and t.exported = false and t.samabe=${data.samabe} returning *;`
         const rows:ITicket[] = (await conn.query(sql)).rows
         console.log(sql, rows)
         const txt = {

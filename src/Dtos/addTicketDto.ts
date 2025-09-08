@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsBoolean } from "class-validator";
 
 
 export default class {
@@ -66,4 +66,8 @@ export default class {
     @IsString()
     @IsNotEmpty()
     concepto_cod: string
+
+    @IsBoolean()
+    @IsNotEmpty()
+    samabe: boolean
 }
