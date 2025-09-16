@@ -327,7 +327,7 @@ export class TicketsService {
                 line += this.fillEmpty("",s,true,true,false)    
             });
             //Importe del mov mod lcal
-            line += this.fillEmpty(t.total.toString(),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toFixed(2),16,false,false,false)
 
             itemLines.push(line)
         }
