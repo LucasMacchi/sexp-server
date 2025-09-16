@@ -311,7 +311,7 @@ export class TicketsService {
             //fecha venc
             line += this.fillEmpty("",8,false,true,false)
             //import mov
-            line += this.fillEmpty(t.total.toString(),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toFixed(2),16,false,false,false)
             //nro cheque
             line += this.fillEmpty("",8,false,true,false)
             //cod de bnco
