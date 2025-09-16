@@ -177,7 +177,7 @@ export class TicketsService {
             //fecha vencimiento
             line += this.fillEmpty(t.fecha,8,false,true,false)
             //Importe total comprobante
-            line += this.fillEmpty(t.total.toString(),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toString(),16,false,false,false)
             //Apertura contable
             line += this.fillEmpty("",4,true,true,false)
             //Direcion prov
