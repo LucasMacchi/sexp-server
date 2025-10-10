@@ -12,6 +12,8 @@ export class ExpedienteService {
         console.log(data)
         const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}='${data.value}' WHERE exp_id = ${id};`
         await conn.query(sql)
+        const sqlLastMod = `UPDATE public.glpi_sexp_expediente SET last_mod=NOW() WHERE exp_id = ${id};`
+        await conn.query(sqlLastMod)
         await conn.end()
         return `Expediente actualizado.`
     }
@@ -44,7 +46,8 @@ export class ExpedienteService {
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows[0]
-        //console.log(exps)
+        const sqlLastSaw = `UPDATE public.glpi_sexp_expediente SET last_saw=NOW() WHERE exp_id = ${id};`
+        await conn.query(sqlLastSaw)
         await conn.end()
         return exps
     }

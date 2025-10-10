@@ -172,7 +172,7 @@ export class TicketsService {
             line += this.fillEmpty("",4,true,true,false)
             //cCondicion de pago
             line += this.fillEmpty("1",3,false,true,false)
-            //Codigo de causa de emision
+            //Codigo de causa de emision -126
             line += this.fillEmpty("",4,true,true,false)
             //fecha vencimiento
             line += this.fillEmpty(t.fecha,8,false,true,false)
