@@ -177,7 +177,7 @@ export class TicketsService {
             //fecha vencimiento
             line += this.fillEmpty(t.fecha,8,false,true,false)
             //Importe total comprobante
-            line += this.fillEmpty((t.neto + t.iva).toFixed(3),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toFixed(1),16,false,false,false)
             //Apertura contable
             line += this.fillEmpty("",4,true,true,false)
             //Direcion prov
@@ -311,7 +311,7 @@ export class TicketsService {
             //fecha venc
             line += this.fillEmpty("",8,false,true,false)
             //import mov
-            line += this.fillEmpty((t.neto + t.iva).toFixed(3),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toFixed(1),16,false,false,false)
             //nro cheque
             line += this.fillEmpty("",8,false,true,false)
             //cod de bnco
@@ -327,7 +327,7 @@ export class TicketsService {
                 line += this.fillEmpty("",s,true,true,false)    
             });
             //Importe del mov mod lcal
-            line += this.fillEmpty((t.neto + t.iva).toFixed(3),16,false,false,false)
+            line += this.fillEmpty((t.neto + t.iva).toFixed(1),16,false,false,false)
 
             itemLines.push(line)
         }
