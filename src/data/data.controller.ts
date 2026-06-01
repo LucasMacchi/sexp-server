@@ -14,17 +14,22 @@ export class DataController {
     @UseGuards(userGuard)
     @Get('services')
     async getServices () {
-        return this.dataService.getterData('glpi_sexp_servicio')
+        return this.dataService.getterData('glpi_sexp_servicios_1')
     }
     @UseGuards(userGuard)
     @Get('empresas')
     async getEmpresas () {
-        return this.dataService.getterData('glpi_sexp_empresa')
+        return this.dataService.getterData('glpi_sexp_empresa_1')
+    }
+    @UseGuards(userGuard)
+    @Get('clientes')
+    async getClientes () {
+        return this.dataService.getterData('glpi_sexp_client')
     }
     @UseGuards(userGuard)
     @Get('estados')
     async getEstados () {
-        return this.dataService.getterData('glpi_sexp_estado')
+        return this.dataService.getterData('glpi_sexp_estado_1')
     }
     @UseGuards(userGuard)
     @Post('service/:service')

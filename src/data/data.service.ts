@@ -15,7 +15,7 @@ export class DataService {
     async addService (service: string) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `INSERT INTO public.glpi_sexp_servicio
+        const sql = `INSERT INTO public.glpi_sexp_servicios_1
                     (nombre)
                     VALUES('${service}');`
         await conn.query(sql)
@@ -25,7 +25,7 @@ export class DataService {
     async addEmpresa (empresa: string, service: number) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `INSERT INTO public.glpi_sexp_empresa
+        const sql = `INSERT INTO public.glpi_sexp_empresa_1
                     (nombre, servicio_id)
                     VALUES('${empresa}', ${service});`
         await conn.query(sql)
