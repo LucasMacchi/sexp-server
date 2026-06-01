@@ -15,6 +15,10 @@ export default class expedienteDto {
 
     @IsNumber()
     @IsNotEmpty()
+    client_id: number
+
+    @IsNumber()
+    @IsNotEmpty()
     estado_id: number
 
     @IsNumber()
