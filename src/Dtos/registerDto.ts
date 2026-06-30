@@ -14,6 +14,10 @@ export default class registerDto {
     @IsNotEmpty()
     email: string
 
+    @IsString()
+    @IsNotEmpty()
+    password: string
+
     @IsBoolean()
     @IsNotEmpty()
     admin: boolean

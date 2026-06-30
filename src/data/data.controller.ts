@@ -37,13 +37,18 @@ export class DataController {
         return await this.dataService.addService(service)
     }
     @UseGuards(userGuard)
-    @Post('empresa/:empresa/:service')
-    async createEmpresa (@Param('service') service: string,@Param('empresa') empresa: string) {
-        return await this.dataService.addEmpresa(empresa,parseInt(service))
+    @Post('empresa/:empresa')
+    async createEmpresa (@Param('empresa') empresa: string) {
+        return await this.dataService.addEmpresa(empresa)
     }
     @UseGuards(userGuard)
     @Post('estado/:estado')
     async createEstado (@Param('estado') estado: string){
         return await this.dataService.addState(estado)
+    }
+    @UseGuards(userGuard)
+    @Post('cliente/:cliente/:publico')
+    async createCliente (@Param('cliente') cliente: string, @Param('publico') publico: boolean) {
+        return await this.dataService.addCliente(cliente, publico)
     }
 }
