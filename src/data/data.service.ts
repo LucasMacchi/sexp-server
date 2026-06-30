@@ -22,12 +22,12 @@ export class DataService {
         await conn.end()
         return "Servicio "+service+" creado."
     }
-    async addEmpresa (empresa: string, service: number) {
+    async addEmpresa (empresa: string) {
         const conn = clientReturner()
         await conn.connect()
         const sql = `INSERT INTO public.glpi_sexp_empresa_1
-                    (nombre, servicio_id)
-                    VALUES('${empresa}', ${service});`
+                    (nombre)
+                    VALUES('${empresa}');`
         await conn.query(sql)
         await conn.end()
         return "Empresa "+empresa+" creada."
@@ -35,11 +35,21 @@ export class DataService {
     async addState (estado: string) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `INSERT INTO public.glpi_sexp_estado
+        const sql = `INSERT INTO public.glpi_sexp_estado_1
                     (concepto)
                     VALUES('${estado}');`
         await conn.query(sql)
         await conn.end()
         return `Estado ${estado} creado.`
+    }
+    async addCliente (cliente: string,publico:boolean) {
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `INSERT INTO public.glpi_sexp_cliente
+                    (descripcion,publico)
+                    VALUES('${cliente}', ${publico});`
+        await conn.query(sql)
+        await conn.end()
+        return `Cliente ${cliente} creado.`
     }
 }

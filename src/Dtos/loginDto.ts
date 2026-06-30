@@ -4,4 +4,8 @@ export default class loginDto {
     @IsString()
     @IsNotEmpty()
     email: string
+
+    @IsString()
+    @IsNotEmpty()
+    password: string
 }
