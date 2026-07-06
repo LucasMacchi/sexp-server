@@ -10,6 +10,14 @@ export class ExpedienteService {
         const conn = clientReturner()
         await conn.connect()
         console.log(data)
+        if(data.prop === "estado_id") {
+            const sqlGetEst = `SELECT estado_id FROM public.glpi_sexp_expediente WHERE exp_id = ${id};`
+            const prev_estado:number = (await conn.query(sqlGetEst)).rows[0]["estado_id"]
+            console.log(prev_estado)
+            const sqlLogEstado = `INSERT INTO public.glpi_sexp_estados_log(fecha, prev, post, exp_id,fecha_prev) VALUES (NOW(), $1, $2, $3,(SELECT MAX(fecha) FROM public.glpi_sexp_estados_log WHERE exp_id = $4));`
+            await conn.query(sqlLogEstado, [prev_estado, data.value, id, id])
+
+        }
         const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}='${data.value}' WHERE exp_id = ${id};`
         await conn.query(sql)
         const sqlLastMod = `UPDATE public.glpi_sexp_expediente SET last_mod=NOW() WHERE exp_id = ${id};`
