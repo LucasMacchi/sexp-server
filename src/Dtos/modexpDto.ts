@@ -1,4 +1,4 @@
-import {IsString, IsNotEmpty } from "class-validator";
+import {IsString, IsNotEmpty, IsNumber } from "class-validator";
 
 export default class modexpDto {
     @IsString()
@@ -8,4 +8,8 @@ export default class modexpDto {
     @IsString()
     @IsNotEmpty()
     value: string
+
+    @IsNumber()
+    @IsNotEmpty()
+    userId: number
 }
