@@ -26,7 +26,7 @@ export class ExpedienteService {
         return `Expediente actualizado.`
     }
     async getExpedientes () {
-        const sql = `SELECT * FROM public.glpi_sexp_expediente order by fecha_presentacion DESC;;`
+        const sql = `SELECT * FROM public.glpi_sexp_expediente order by fecha_presentacion DESC;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows
@@ -42,7 +42,7 @@ export class ExpedienteService {
         '${exp.concepto}', '${exp.periodo}', '${exp.fecha_presentacion}', 
         '${exp.fecha_presentacion}', '${exp.nro_factura}', ${exp.empresa_id},
          ${exp.estado_id}, ${exp.importe}, '${exp.descripcion}'
-         , '${exp.tipo}', 'false', ${exp.importe}, ${exp.client_id});`
+         , '${exp.tipo}', 'false', 0, ${exp.client_id});`
         
         const conn = clientReturner()
         await conn.connect()
