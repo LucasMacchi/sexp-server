@@ -19,10 +19,17 @@ export class ExpedienteService {
             await conn.query(sqlLogEstado, [prev_estado, data.value, id, fecha])
 
         }
-        const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}='${data.value}', last_mod=NOW()  WHERE exp_id = ${id};`
-        const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id) VALUES ($1, $2, $3, $4);`
-        await conn.query(sql)
-        await conn.query(log,[id,data.prop,data.value,data.userId])
+        if(data.prop !== "seguimiento") {
+            const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4,(SELECT ${data.prop} FROM public.glpi_sexp_expediente WHERE exp_id = ${id}));`
+            const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}='${data.value}', last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = ${id};`
+            await conn.query(log,[id,data.prop,data.value,data.userId])
+            await conn.query(sql)
+        }
+        else {
+            const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id) VALUES ($1, $2, $3, $4);`
+            await conn.query(log,[id,data.prop.toUpperCase(),data.value,data.userId])
+        }
+
         await conn.end()
         return `Expediente actualizado.`
     }
@@ -52,11 +59,26 @@ export class ExpedienteService {
     }
     async getUniqExpediente (id: number) {
         const sql = `SELECT * FROM public.glpi_sexp_expediente WHERE exp_id = ${id};`
+        const sqlHis = `SELECT l.*,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
+        JOIN public.glpi_sexp_users u ON u.user_id = l.user_id WHERE l.exp_id = $1 ORDER BY l.fecha DESC;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows[0]
+        exps.historial = (await conn.query(sqlHis,[id])).rows
         const sqlLastSaw = `UPDATE public.glpi_sexp_expediente SET last_saw=NOW() WHERE exp_id = ${id};`
         await conn.query(sqlLastSaw)
+        await conn.end()
+        return exps
+    }
+
+    async getLastHistorial () {
+        const sql = `SELECT l.*,e.numero_exp,e.concepto,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
+        JOIN public.glpi_sexp_expediente e ON e.exp_id = l.exp_id
+        JOIN public.glpi_sexp_users u ON u.user_id = l.user_id 
+        ORDER BY l.fecha DESC LIMIT 100;`
+        const conn = clientReturner()
+        await conn.connect()
+        const exps = (await conn.query(sql)).rows
         await conn.end()
         return exps
     }

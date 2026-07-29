@@ -19,6 +19,11 @@ export class ExpedienteController {
         return await this.expService.getUniqExpediente(id)
     }
     @UseGuards(userGuard)
+    @Get("historial")
+    async getlastHistorial () {
+        return await this.expService.getLastHistorial()
+    }
+    @UseGuards(userGuard)
     @Get("number/:nro")
     async getUniqExpNro (@Param('nro') nro: string) {
         return await this.expService.getByNro(nro)
