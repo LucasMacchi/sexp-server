@@ -24,6 +24,11 @@
             "concepto_cod": "INSRACIO21%",
             "concepto_des": "Insumos de Racionamiento 21%",
             "concepto_iva": 10.5
+        },
+        {
+            "concepto_cod": "INDUMEN21%",
+            "concepto_des": "Indumentaria 21%",
+            "concepto_iva": 10.5
         }
     ]
 }
