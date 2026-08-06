@@ -21,9 +21,9 @@ export class ExpedienteService {
         }
         if(data.prop !== "seguimiento") {
             const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4,(SELECT ${data.prop} FROM public.glpi_sexp_expediente WHERE exp_id = ${id}));`
-            const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}='${data.value}', last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = ${id};`
+            const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
             await conn.query(log,[id,data.prop,data.value,data.userId])
-            await conn.query(sql)
+            await conn.query(sql,[data.value,id])
         }
         else {
             const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id) VALUES ($1, $2, $3, $4);`
@@ -50,7 +50,7 @@ export class ExpedienteService {
         '${exp.concepto}', '${exp.periodo}', '${exp.fecha_presentacion}', 
         '${exp.fecha_presentacion}', '${exp.nro_factura}', ${exp.empresa_id},
          ${exp.estado_id}, ${exp.importe}, '${exp.descripcion}'
-         , '${exp.tipo}', 'false', 0, ${exp.client_id});`
+         , '${exp.tipo}', ${exp.ocultado}, 0, ${exp.client_id});`
         
         const conn = clientReturner()
         await conn.connect()
