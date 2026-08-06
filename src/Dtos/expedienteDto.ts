@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsNumber, IsBoolean } from "class-validator";
 
 export default class expedienteDto {
     @IsNumber()
@@ -39,6 +39,10 @@ export default class expedienteDto {
     @IsString()
     @IsNotEmpty()
     tipo: string
+
+    @IsBoolean()
+    @IsNotEmpty()
+    ocultado: boolean
 
     @IsString()
     @IsNotEmpty()
