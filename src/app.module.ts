@@ -11,9 +11,10 @@ import { DataModule } from './data/data.module';
 import { TicketsController } from './tickets/tickets.controller';
 import { TicketsModule } from './tickets/tickets.module';
 import { TicketsService } from './tickets/tickets.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [UserModule, ExpedienteModule, DataModule, TicketsModule],
+  imports: [UserModule, ExpedienteModule, DataModule, TicketsModule,HttpModule],
   controllers: [AppController, UserController, ExpedienteController, TicketsController],
   providers: [AppService, ExpedienteService, UserService, TicketsService],
 })
