@@ -69,6 +69,18 @@ export class ExpedienteController {
     }
 
     @UseGuards(userGuard)
+    @Get("cntGral/:nro")
+    async contaduriaGralAPI (@Param("nro") nro: string) {
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: false,
+        });
+        const url = `https://nportal.cgpc.gob.ar/documentos/apiweb/Consultas-Web/consulta?expediente=%27${nro}%27`
+        const {data} = await firstValueFrom(this.httpService.get(url,{httpsAgent}))
+        console.log(data)
+        return data
+    }
+
+    @UseGuards(userGuard)
     @Get("educacion/:nro")
     async minEduAPI (@Param("nro") nro: string) {
         const repartic = nro.slice(0,3)

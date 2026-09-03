@@ -10,9 +10,14 @@ export class ExpedienteService {
         const conn = clientReturner()
         await conn.connect()
         console.log(data)
+        let isFacturado = false
         if(data.prop === "estado_id") {
-            const sqlGetEst = `SELECT estado_id FROM public.glpi_sexp_expediente WHERE exp_id = ${id};`
+            const sqlGetEst = `SELECT e.estado_id FROM public.glpi_sexp_expediente e  WHERE e.exp_id = ${id};`
+            const newConcepto = (await conn.query(`SELECT concepto FROM public.glpi_sexp_estado_1 WHERE estado_id = ${data.value};`)).rows[0]["concepto"]
             const prev_estado:number = (await conn.query(sqlGetEst)).rows[0]["estado_id"]
+            if(newConcepto === 'Facturado pagado') {
+                isFacturado = true
+            }
             const lastLog = `SELECT MAX(fecha) FROM public.glpi_sexp_estados_log WHERE exp_id = $1`
             const fecha:string = (await conn.query(lastLog,[id])).rows[0]["max"]
             const sqlLogEstado = `INSERT INTO public.glpi_sexp_estados_log(fecha, prev, post, exp_id,fecha_prev) VALUES (NOW(), $1, $2, $3, $4);`
@@ -21,7 +26,9 @@ export class ExpedienteService {
         }
         if(data.prop !== "seguimiento") {
             const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4,(SELECT ${data.prop} FROM public.glpi_sexp_expediente WHERE exp_id = ${id}));`
-            const sql = `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
+            const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
+            `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
+
             await conn.query(log,[id,data.prop,data.value,data.userId])
             await conn.query(sql,[data.value,id])
         }
