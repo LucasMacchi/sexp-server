@@ -26,11 +26,13 @@ export class ExpedienteService {
         }
         if(data.prop !== "seguimiento") {
             const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4,(SELECT ${data.prop} FROM public.glpi_sexp_expediente WHERE exp_id = ${id}));`
+            const importeLog = 'SELECT importe_2 FROM public.glpi_sexp_expediente WHERE exp_id = $1;'
+            if(isFacturado) {
+                const prevImporte = await conn.query(importeLog,[id])[0]["importe_2"]
+                await conn.query(log,[id,"importe_2",prevImporte,data.userId])
+            }
             const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
             `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
-            if(isFacturado) {
-                await conn.query(log,[id,data.prop,data.value,data.userId])
-            }
             await conn.query(log,[id,data.prop,data.value,data.userId])
             await conn.query(sql,[data.value,id])
         }
