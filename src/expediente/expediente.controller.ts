@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Patch, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, Patch, Param, UseGuards,Delete } from '@nestjs/common';
 import { ExpedienteService } from './expediente.service';
 import expedienteDto from 'src/Dtos/expedienteDto';
 import modexpDto from 'src/Dtos/modexpDto';
@@ -27,6 +27,11 @@ export class ExpedienteController {
     @Get('all')
     async getExp () {
         return await this.expService.getExpedientes()
+    }
+    @UseGuards(userGuard)
+    @Delete('delete/:id/:user')
+    async deleteExp (@Param('id') id: number, @Param('user') user: number) {
+        return await this.expService.deleteExpediente(id, user)
     }
     @UseGuards(userGuard)
     @Get("uniq/:id")

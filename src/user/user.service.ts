@@ -42,7 +42,7 @@ export class UserService {
     async login(data: loginDto) {
         const conn = clientReturner()
         await conn.connect()
-        const sql = `SELECT user_id, email, activated, "admin" FROM public.glpi_sexp_users WHERE email = $1 AND password = $2;`
+        const sql = `SELECT user_id, email, activated, "admin",moderador FROM public.glpi_sexp_users WHERE email = $1 AND password = $2;`
         const rows = await conn.query(sql,[data.email,data.password])
         const userData = rows.rows[0]
         const sql2 = `SELECT * FROM public.glpi_sexp_user_empresa WHERE user_id = ${userData['user_id']};`
@@ -60,9 +60,9 @@ export class UserService {
         const conn = clientReturner()
         await conn.connect()
         const sql = `INSERT INTO public.glpi_sexp_users
-        (first_name, last_name, email, activated, "admin", date_activated, password)
-        VALUES('${data.first_name}', '${data.last_name}', '${data.email}', false, ${data.admin}, NOW(), '${data.password}') RETURNING user_id;`
-        await conn.query(sql)
+        (first_name, last_name, email, activated, "admin", date_activated, password,moderador)
+        VALUES($1, $2, $3, false, $4, NOW(), $5, $6) RETURNING user_id;`
+        await conn.query(sql,[data.first_name, data.last_name, data.email, data.admin, data.password,data.moderador])
         await conn.end()
         return 'Usuario creado: '+data.email
     }

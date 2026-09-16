@@ -21,4 +21,8 @@ export default class registerDto {
     @IsBoolean()
     @IsNotEmpty()
     admin: boolean
+
+    @IsBoolean()
+    @IsNotEmpty()
+    moderador: boolean
 }
