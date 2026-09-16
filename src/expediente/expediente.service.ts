@@ -45,12 +45,22 @@ export class ExpedienteService {
         return `Expediente actualizado.`
     }
     async getExpedientes () {
-        const sql = `SELECT * FROM public.glpi_sexp_expediente order by fecha_presentacion DESC;`
+        const sql = `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false ORDER BY fecha_presentacion DESC;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows
         await conn.end()
         return exps
+    }
+    async deleteExpediente (id: number,user: number) {
+        const sql = 'UPDATE public.glpi_sexp_expediente SET deleted = true WHERE exp_id = $1;'
+        const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id) VALUES ($1, $2, $3, $4);`
+        const conn = clientReturner()
+        await conn.connect()
+        await conn.query(sql,[id])
+        await conn.query(log,[id,"Eliminado","Expediente eliminado",user])
+        await conn.end()
+        return `Expediente eliminado.`
     }
     async createExpediente (exp: expedienteDto){
         const sql = `INSERT INTO public.glpi_sexp_expediente
@@ -95,7 +105,7 @@ export class ExpedienteService {
     }
 
     async getByNro (nro: string) {
-        const sql = `SELECT exp_id FROM public.glpi_sexp_expediente WHERE numero_exp = '${nro}';`
+        const sql = `SELECT exp_id FROM public.glpi_sexp_expediente WHERE numero_exp = '${nro}' AND deleted = false;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows[0]
