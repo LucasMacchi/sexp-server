@@ -96,7 +96,7 @@ export class ExpedienteService {
         const sql = `SELECT l.*,e.numero_exp,e.concepto,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
         JOIN public.glpi_sexp_expediente e ON e.exp_id = l.exp_id
         JOIN public.glpi_sexp_users u ON u.user_id = l.user_id 
-        ORDER BY l.fecha DESC LIMIT 100;`
+        ORDER BY l.log_id DESC LIMIT 100;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows
