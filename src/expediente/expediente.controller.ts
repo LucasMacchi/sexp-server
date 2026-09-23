@@ -26,7 +26,12 @@ export class ExpedienteController {
     @UseGuards(userGuard)
     @Get('all')
     async getExp () {
-        return await this.expService.getExpedientes()
+        return await this.expService.getExpedientes(false)
+    }
+    @UseGuards(userGuard)
+    @Get('all/tracked')
+    async getExpTracked () {
+        return await this.expService.getExpedientes(true)
     }
     @UseGuards(userGuard)
     @Delete('delete/:id/:user')
@@ -58,6 +63,7 @@ export class ExpedienteController {
     async editExp (@Param('id') id: number, @Body() data: modexpDto) {
       return await this.expService.editExpediente(id, data)
     }
+
     @UseGuards(userGuard)
     @Get("salud/:nro")
     async minSaludAPI (@Param("nro") nro: string) {
