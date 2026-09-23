@@ -33,7 +33,7 @@ export class ExpedienteService {
             }
             const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
             `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
-            await conn.query(log,[id,data.prop,data.value,data.userId])
+            data.prop !== "api1" && data.prop !== "api2" ? await conn.query(log,[id,data.prop,data.value,data.userId]) : null
             await conn.query(sql,[data.value,id])
         }
         else {
@@ -44,8 +44,8 @@ export class ExpedienteService {
         await conn.end()
         return `Expediente actualizado.`
     }
-    async getExpedientes () {
-        const sql = `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false ORDER BY fecha_presentacion DESC;`
+    async getExpedientes (track:boolean) {
+        const sql = track ? `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false AND track = true ORDER BY fecha_presentacion DESC;` : `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false ORDER BY fecha_presentacion DESC;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows
