@@ -52,7 +52,17 @@ export class ExpedienteService {
         return `Expediente actualizado.`
     }
     async getExpedientes (track:boolean) {
-        const sql = track ? `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false AND track = true ORDER BY fecha_presentacion DESC;` : `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false ORDER BY fecha_presentacion DESC;`
+        let sql = `
+            SELECT *,
+                CASE
+                    WHEN (SELECT EXTRACT(DAY FROM NOW() - MAX(el.fecha)) FROM public.glpi_sexp_estados_log el WHERE el.exp_id =  e.exp_id) IS NOT null THEN (SELECT EXTRACT(DAY FROM NOW() - MAX(el.fecha)) FROM public.glpi_sexp_estados_log el WHERE el.exp_id =  e.exp_id)
+                    ELSE EXTRACT(DAY FROM NOW() - e.fecha_presentacion)
+                END as dias_diff
+            FROM public.glpi_sexp_expediente e
+            WHERE e.deleted = false ORDER BY e.fecha_presentacion DESC;`
+        if(track) {
+            sql = `SELECT * FROM public.glpi_sexp_expediente WHERE deleted = false AND track = true ORDER BY fecha_presentacion DESC;`
+        }
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows
