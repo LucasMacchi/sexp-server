@@ -38,7 +38,7 @@ export class ExpedienteService {
                 const prevImporte = await (await conn.query(importeLog,[id])).rows[0]["importe_2"]
                 await conn.query(log,[id,"importe_2",prevImporte,data.userId])
             }
-            const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
+            const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), ocultado = true, fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
             `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
             data.prop !== "api1" && data.prop !== "api2" ? await conn.query(log,[id,data.prop,data.value,data.userId]) : null
             await conn.query(sql,[data.value,id])
