@@ -7,6 +7,9 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as https from 'https';
 
+
+const secret = process.env.UPDATER_KEY ?? undefined
+
 @Controller('expediente')
 export class ExpedienteController {
     constructor(private expService: ExpedienteService,private httpService:HttpService){}
@@ -58,7 +61,7 @@ export class ExpedienteController {
        return await this.expService.getMinSaludApi(nro,this.httpService)
     }
 
-    @UseGuards(userGuard)
+    //@UseGuards(userGuard)
     @Get("cntGral/:nro")
     async contaduriaGralAPI (@Param("nro") nro: string) {
        return await this.expService.getContaduriaGralApi(nro,this.httpService)
@@ -75,6 +78,17 @@ export class ExpedienteController {
     async chacoAPI (@Param("nro") nro: string): Promise<string[]>{
        return await this.expService.getMinChacoAPI(nro,this.httpService)
     }
+
+    @Get("masivo/updater/:key")
+    async massiveUpdater (@Param("key") key: string): Promise<string[]>{
+        if(secret && secret === key) return this.expService.massiveUpdate(this.httpService)
+        else return ["INVALID KEY"]
+    }
     
+    @Get('all/updater/:key')
+    async allExpUpdater (@Param("key") key: string) {
+        if(secret && secret === key) return this.expService.getAllExpedientesForUpdate()
+        else return ["INVALID KEY"]
+    }
 }
 

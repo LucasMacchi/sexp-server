@@ -16,7 +16,6 @@ export class ExpedienteService {
     async editExpediente (id: number, data: modexpDto) {
         const conn = clientReturner()
         await conn.connect()
-        console.log(data)
         let isFacturado = false
         if(data.prop === "estado_id") {
             const sqlGetEst = `SELECT e.estado_id FROM public.glpi_sexp_expediente e  WHERE e.exp_id = ${id};`
@@ -140,7 +139,6 @@ export class ExpedienteService {
         });
         const url = `https://saludcorrientes.gob.ar/w/wp-content/themes/salud/js/request.php?e=${e}&n=${n}&f=${f}&format=jsonp`
         const {data} = await firstValueFrom(httpService.get(url,{httpsAgent}))
-        console.log(data)
         return decode(data["contenido"]["ubicacion"])
     }
 
@@ -247,5 +245,79 @@ export class ExpedienteService {
         const url = `https://nportal.cgpc.gob.ar/documentos/apiweb/Consultas-Web/consulta?expediente=%27${nro}%27`
         const {data} = await firstValueFrom(httpService.get(url,{httpsAgent}))
         return data
+    }
+
+    async getAllExpedientesForUpdate () {
+        const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND numero_exp NOT LIKE '%-%' ORDER BY exp_id ASC;`
+        const conn = clientReturner()
+        await conn.connect()
+        const exps = (await conn.query(sql))
+        await conn.end()
+        return exps
+    }
+
+    async massiveUpdate (httpService:HttpService) {
+        interface IExpRes {
+            exp_id:number,
+            numero_exp: string,
+            api1: string,
+            api2: string
+        }
+        const allExp = 'SELECT exp_id,numero_exp,api1,api2 FROM public.glpi_sexp_expediente WHERE ocultado = false ORDER BY exp_id ASC;'
+        const updaterAPI1 = "UPDATE public.glpi_sexp_expediente SET api1=$2, diff=$3 WHERE exp_id = $1;"
+        const updaterAPI2 = "UPDATE public.glpi_sexp_expediente SET api2=$2, diff=$3 WHERE exp_id = $1;"
+        const conn = clientReturner()
+        await conn.connect()
+        const expedientes:IExpRes[] = (await conn.query(allExp)).rows
+        const dateNow = new Date().toISOString().split("T")[0]
+        let changes:string[] = []
+        for(const ex of expedientes) {
+            if(ex && ex.numero_exp.length > 4) {
+                try {
+                    if(ex.numero_exp.includes("-")) {
+                        const res = await this.getMinChacoAPI(ex.numero_exp,httpService)
+                        if(res[0] !== ex.api1) {
+                            await conn.query(updaterAPI1,[ex.exp_id,res[0],true])
+                            changes.push(ex.numero_exp+" ACTUALIZADO API 1 - "+dateNow)
+                        }
+                        else {
+                            await conn.query(updaterAPI1,[ex.exp_id,res[0],false])
+                            changes.push(ex.numero_exp+" NO ACTUALIZADO API 1 - "+dateNow)
+                        }
+                    }
+                    else {
+                        if(ex.numero_exp.slice(0,3) === "310") {
+                            const res = await this.getMinSaludApi(ex.numero_exp,httpService)
+                            if(res !== ex.api2) {
+                                await conn.query(updaterAPI2,[ex.exp_id,res,true])
+                                changes.push(ex.numero_exp+" ACTUALIZADO API 2 - "+dateNow)
+                            }
+                            else {
+                                await conn.query(updaterAPI2,[ex.exp_id,res,false])
+                                changes.push(ex.numero_exp+" NO ACTUALIZADO API 2 - "+dateNow)
+                            }
+                        }
+                        if(ex.numero_exp.slice(0,3) === "320") {
+                            const res = await this.getMinEduApi(ex.numero_exp,httpService)
+                            if(res !== ex.api2) {
+                                await conn.query(updaterAPI2,[ex.exp_id,res,true])
+                                changes.push(ex.numero_exp+" ACTUALIZADO API 2 - "+dateNow)
+                            }
+                            else {
+                                await conn.query(updaterAPI2,[ex.exp_id,res,false])
+                                changes.push(ex.numero_exp+" NO ACTUALIZADO API 2 - "+dateNow)
+                            }                        
+                        }
+                    }
+
+                } catch (error) {
+                    changes.push(ex.numero_exp+"ERROR NO ACTUALIZADO - "+dateNow)
+                    console.log(error)
+                }
+
+            }
+        }
+        await conn.end()
+        return changes
     }
 }
