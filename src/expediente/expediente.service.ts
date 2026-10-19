@@ -248,12 +248,15 @@ export class ExpedienteService {
     }
 
     async getAllExpedientesForUpdate () {
+        interface IExpedienteUpd {
+            numero_exp: string
+        }
         const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND numero_exp NOT LIKE '%-%' ORDER BY exp_id ASC;`
         const conn = clientReturner()
         await conn.connect()
-        const exps = (await conn.query(sql))
+        const exps:IExpedienteUpd[] = (await conn.query(sql)).rows
         await conn.end()
-        return exps
+        return exps.map(e => e.numero_exp)
     }
 
     async massiveUpdate (httpService:HttpService) {
