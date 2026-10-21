@@ -9,6 +9,7 @@ import { decode } from 'node_modules/html-entities/dist/commonjs';
 import * as iconv from 'iconv-lite';
 import extraer from 'src/utils/extraerEdu';
 import * as cheerio from 'cheerio';
+import updaterGral from 'src/Dtos/updaterGral';
 
 @Injectable()
 export class ExpedienteService {
@@ -251,7 +252,7 @@ export class ExpedienteService {
         interface IExpedienteUpd {
             numero_exp: string
         }
-        const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND numero_exp NOT LIKE '%-%' ORDER BY exp_id ASC;`
+        const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false AND numero_exp NOT LIKE '%-%' ORDER BY exp_id ASC;`
         const conn = clientReturner()
         await conn.connect()
         const exps:IExpedienteUpd[] = (await conn.query(sql)).rows
@@ -259,14 +260,14 @@ export class ExpedienteService {
         return exps.map(e => e.numero_exp)
     }
 
-    async massiveUpdate (httpService:HttpService) {
+    async massiveUpdate (httpService:HttpService,gral: updaterGral[]) {
         interface IExpRes {
             exp_id:number,
             numero_exp: string,
             api1: string,
             api2: string
         }
-        const allExp = 'SELECT exp_id,numero_exp,api1,api2 FROM public.glpi_sexp_expediente WHERE ocultado = false ORDER BY exp_id ASC;'
+        const allExp = 'SELECT exp_id,numero_exp,api1,api2 FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false ORDER BY exp_id ASC;'
         const updaterAPI1 = "UPDATE public.glpi_sexp_expediente SET api1=$2, diff=$3 WHERE exp_id = $1;"
         const updaterAPI2 = "UPDATE public.glpi_sexp_expediente SET api2=$2, diff=$3 WHERE exp_id = $1;"
         const conn = clientReturner()
@@ -289,6 +290,17 @@ export class ExpedienteService {
                         }
                     }
                     else {
+                        const general = gral.find(g => g.numero_exp === ex.numero_exp)?.gral
+                        if(general){
+                            if(general !== ex.api1) {
+                                await conn.query(updaterAPI1,[ex.exp_id,general,true])
+                                changes.push(ex.numero_exp+" ACTUALIZADO API 1 - "+dateNow)
+                            }
+                            else {
+                                await conn.query(updaterAPI1,[ex.exp_id,general,false])
+                                changes.push(ex.numero_exp+" NO ACTUALIZADO API 1 - "+dateNow)
+                            }
+                        }
                         if(ex.numero_exp.slice(0,3) === "310") {
                             const res = await this.getMinSaludApi(ex.numero_exp,httpService)
                             if(res !== ex.api2) {
