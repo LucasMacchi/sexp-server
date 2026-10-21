@@ -6,6 +6,7 @@ import { userGuard } from 'src/user/userAuth.guard';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as https from 'https';
+import updaterGral from 'src/Dtos/updaterGral';
 
 
 const secret = process.env.UPDATER_KEY ?? undefined
@@ -79,9 +80,9 @@ export class ExpedienteController {
        return await this.expService.getMinChacoAPI(nro,this.httpService)
     }
 
-    @Get("masivo/updater/:key")
-    async massiveUpdater (@Param("key") key: string): Promise<string[]>{
-        if(secret && secret === key) return this.expService.massiveUpdate(this.httpService)
+    @Post("masivo/updater/:key")
+    async massiveUpdater (@Param("key") key: string,@Body() gral: updaterGral[]): Promise<string[]>{
+        if(secret && secret === key) return this.expService.massiveUpdate(this.httpService,gral)
         else return ["INVALID KEY"]
     }
     
