@@ -252,7 +252,7 @@ export class ExpedienteService {
         interface IExpedienteUpd {
             numero_exp: string
         }
-        const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false AND numero_exp NOT LIKE '%-%' ORDER BY exp_id ASC;`
+        const sql = `SELECT numero_exp FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false AND numero_exp NOT LIKE '%-%' AND numero_exp NOT LIKE '%N/A%' ORDER BY exp_id ASC;`
         const conn = clientReturner()
         await conn.connect()
         const exps:IExpedienteUpd[] = (await conn.query(sql)).rows
@@ -267,7 +267,7 @@ export class ExpedienteService {
             api1: string,
             api2: string
         }
-        const allExp = 'SELECT exp_id,numero_exp,api1,api2 FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false ORDER BY exp_id ASC;'
+        const allExp = `SELECT exp_id,numero_exp,api1,api2 FROM public.glpi_sexp_expediente WHERE ocultado = false AND deleted = false AND numero_exp NOT LIKE '%N/A%' ORDER BY exp_id ASC;`
         const updaterAPI1 = "UPDATE public.glpi_sexp_expediente SET api1=$2, diff=$3 WHERE exp_id = $1;"
         const updaterAPI2 = "UPDATE public.glpi_sexp_expediente SET api2=$2, diff=$3 WHERE exp_id = $1;"
         const conn = clientReturner()
