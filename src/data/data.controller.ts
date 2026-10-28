@@ -29,8 +29,15 @@ export class DataController {
     @UseGuards(userGuard)
     @Get('estados')
     async getEstados () {
-        return this.dataService.getterData('glpi_sexp_estado_1')
+        return this.dataService.getterEstados()
     }
+    /*
+    @UseGuards(userGuard)
+    @Get('cotizacion/parametros')
+    async getCotizacionParams () {
+        return this.dataService.getCotizParams()
+    }
+    */
     @UseGuards(userGuard)
     @Post('service/:service')
     async createService (@Param('service') service: string) {
