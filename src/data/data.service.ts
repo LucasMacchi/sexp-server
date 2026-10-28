@@ -12,6 +12,25 @@ export class DataService {
         await conn.end()
         return result
     }
+    async getterEstados () {
+        const conn = clientReturner()
+        await conn.connect()
+        const sql = `SELECT * FROM public.glpi_sexp_estado_1 ORDER BY concepto ASC;`
+        const result = (await conn.query(sql)).rows
+        await conn.end()
+        return result
+    }
+    /*
+    async getCotizParams () {
+        const conn = clientReturner()
+        await conn.connect()
+
+        const sql = `SELECT * FROM public.glpi_cotizador_params ORDER BY item ASC ;`
+        const result = (await conn.query(sql)).rows
+        await conn.end()
+        return result
+    }
+    */
     async addService (service: string) {
         const conn = clientReturner()
         await conn.connect()

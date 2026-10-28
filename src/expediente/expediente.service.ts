@@ -33,10 +33,13 @@ export class ExpedienteService {
         }
         if(data.prop !== "seguimiento") {
             const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4,(SELECT ${data.prop} FROM public.glpi_sexp_expediente WHERE exp_id = ${id}));`
-            const importeLog = 'SELECT importe_2 FROM public.glpi_sexp_expediente WHERE exp_id = $1;'
+            const importeLog = 'SELECT importe_2,importe FROM public.glpi_sexp_expediente WHERE exp_id = $1;'
            if(isFacturado) {
-                const prevImporte = await (await conn.query(importeLog,[id])).rows[0]["importe_2"]
-                await conn.query(log,[id,"importe_2",prevImporte,data.userId])
+                const prevImporte = await (await conn.query(importeLog,[id])).rows[0]
+                const prev = await prevImporte["importe_2"]
+                const actual = await prevImporte["importe"]
+                const logCobrado = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4, $5);`
+                await conn.query(logCobrado,[id,"importe_2",actual,data.userId],prev)
             }
             const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), ocultado = true, fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
             `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
@@ -277,15 +280,17 @@ export class ExpedienteService {
         let changes:string[] = []
         for(const ex of expedientes) {
             if(ex && ex.numero_exp.length > 4) {
+                let wasMod = false
                 try {
                     if(ex.numero_exp.includes("-")) {
                         const res = await this.getMinChacoAPI(ex.numero_exp,httpService)
                         if(res[0] !== ex.api1) {
-                            await conn.query(updaterAPI1,[ex.exp_id,res[0],true])
+                            wasMod = true
+                            await conn.query(updaterAPI1,[ex.exp_id,res[0],wasMod])
                             changes.push(ex.numero_exp+" ACTUALIZADO API 1 - "+dateNow)
                         }
                         else {
-                            await conn.query(updaterAPI1,[ex.exp_id,res[0],false])
+                            await conn.query(updaterAPI1,[ex.exp_id,res[0],wasMod])
                             changes.push(ex.numero_exp+" NO ACTUALIZADO API 1 - "+dateNow)
                         }
                     }
@@ -293,33 +298,36 @@ export class ExpedienteService {
                         const general = gral.find(g => g.numero_exp === ex.numero_exp)?.gral
                         if(general){
                             if(general !== ex.api1) {
-                                await conn.query(updaterAPI1,[ex.exp_id,general,true])
+                                wasMod = true
+                                await conn.query(updaterAPI1,[ex.exp_id,general,wasMod])
                                 changes.push(ex.numero_exp+" ACTUALIZADO API 1 - "+dateNow)
                             }
                             else {
-                                await conn.query(updaterAPI1,[ex.exp_id,general,false])
+                                await conn.query(updaterAPI1,[ex.exp_id,general,wasMod])
                                 changes.push(ex.numero_exp+" NO ACTUALIZADO API 1 - "+dateNow)
                             }
                         }
                         if(ex.numero_exp.slice(0,3) === "310") {
                             const res = await this.getMinSaludApi(ex.numero_exp,httpService)
                             if(res !== ex.api2) {
-                                await conn.query(updaterAPI2,[ex.exp_id,res,true])
+                                wasMod = true
+                                await conn.query(updaterAPI2,[ex.exp_id,res,wasMod])
                                 changes.push(ex.numero_exp+" ACTUALIZADO API 2 - "+dateNow)
                             }
                             else {
-                                await conn.query(updaterAPI2,[ex.exp_id,res,false])
+                                await conn.query(updaterAPI2,[ex.exp_id,res,wasMod])
                                 changes.push(ex.numero_exp+" NO ACTUALIZADO API 2 - "+dateNow)
                             }
                         }
                         if(ex.numero_exp.slice(0,3) === "320") {
                             const res = await this.getMinEduApi(ex.numero_exp,httpService)
                             if(res !== ex.api2) {
-                                await conn.query(updaterAPI2,[ex.exp_id,res,true])
+                                wasMod = true
+                                await conn.query(updaterAPI2,[ex.exp_id,res,wasMod])
                                 changes.push(ex.numero_exp+" ACTUALIZADO API 2 - "+dateNow)
                             }
                             else {
-                                await conn.query(updaterAPI2,[ex.exp_id,res,false])
+                                await conn.query(updaterAPI2,[ex.exp_id,res,wasMod])
                                 changes.push(ex.numero_exp+" NO ACTUALIZADO API 2 - "+dateNow)
                             }                        
                         }
