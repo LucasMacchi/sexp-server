@@ -36,10 +36,11 @@ export class ExpedienteService {
             const importeLog = 'SELECT importe_2,importe FROM public.glpi_sexp_expediente WHERE exp_id = $1;'
            if(isFacturado) {
                 const prevImporte = await (await conn.query(importeLog,[id])).rows[0]
-                const prev = await prevImporte["importe_2"]
-                const actual = await prevImporte["importe"]
+                console.log(prevImporte)
+                const prev = prevImporte["importe_2"]
+                const actual = prevImporte["importe"]
                 const logCobrado = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4, $5);`
-                await conn.query(logCobrado,[id,"importe_2",actual,data.userId],prev)
+                await conn.query(logCobrado,[id,"importe_2",actual,data.userId,prev])
             }
             const sql = isFacturado ? `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1,importe_2 = importe, last_mod=NOW(), ocultado = true, fecha_ult_mod=NOW()  WHERE exp_id = $2;` : 
             `UPDATE public.glpi_sexp_expediente SET ${data.prop}=$1, last_mod=NOW(), fecha_ult_mod=NOW()  WHERE exp_id = $2;`
@@ -101,7 +102,7 @@ export class ExpedienteService {
     async getUniqExpediente (id: number) {
         const sql = `SELECT * FROM public.glpi_sexp_expediente WHERE exp_id = ${id};`
         const sqlHis = `SELECT l.*,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
-        JOIN public.glpi_sexp_users u ON u.user_id = l.user_id WHERE l.exp_id = $1 ORDER BY l.fecha DESC;`
+        JOIN public.glpi_sexp_users u ON u.user_id = l.user_id WHERE l.exp_id = $1 ORDER BY l.log_id DESC;`
         const conn = clientReturner()
         await conn.connect()
         const exps = (await conn.query(sql)).rows[0]
