@@ -92,11 +92,13 @@ export class ExpedienteService {
         '${exp.concepto}', '${exp.periodo}', '${exp.fecha_presentacion}', 
         '${exp.fecha_presentacion}', '${exp.nro_factura}', ${exp.empresa_id},
          ${exp.estado_id}, ${exp.importe}, '${exp.descripcion}'
-         , '${exp.tipo}', ${exp.ocultado}, 0, ${exp.client_id});`
+         , '${exp.tipo}', ${exp.ocultado}, 0, ${exp.client_id}) RETURNING exp_id;`
         
         const conn = clientReturner()
         await conn.connect()
-        await conn.query(sql)
+        const result = (await conn.query(sql)).rows[0]["exp_id"]
+        const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4, $5);`
+        await conn.query(log,[result,"CREADO","Expediente creado",exp.user_id,null])
         await conn.end()
     }
     async getUniqExpediente (id: number) {
