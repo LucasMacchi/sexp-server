@@ -98,7 +98,9 @@ export class ExpedienteService {
         await conn.connect()
         const result = (await conn.query(sql)).rows[0]["exp_id"]
         const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id,prev) VALUES ($1, $2, $3, $4, $5);`
+        const logEst = `INSERT INTO public.glpi_sexp_estados_log(fecha, prev, post, exp_id,fecha_prev) VALUES (NOW(), $1, $2, $3, $4);`
         await conn.query(log,[result,"CREADO","Expediente creado",exp.user_id,null])
+        await conn.query(logEst,[null,exp.estado_id,result,'NOW()'])
         await conn.end()
     }
     async getUniqExpediente (id: number) {
