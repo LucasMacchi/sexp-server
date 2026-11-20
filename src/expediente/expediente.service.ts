@@ -14,6 +14,7 @@ import updaterGral from 'src/Dtos/updaterGral';
 @Injectable()
 export class ExpedienteService {
 
+    /** Modifica una propiedad del expediente, registra la auditoría y gestiona el flujo al pasar a "Facturado pagado". */
     async editExpediente (id: number, data: modexpDto) {
         const conn = clientReturner()
         await conn.connect()
@@ -55,6 +56,8 @@ export class ExpedienteService {
         await conn.end()
         return `Expediente actualizado.`
     }
+
+    /** Retorna los expedientes activos calculando los días de inactividad, con opción de filtrar solo seguidos. */
     async getExpedientes (track:boolean) {
         let sql = `
             SELECT *,
@@ -73,6 +76,8 @@ export class ExpedienteService {
         await conn.end()
         return exps
     }
+
+    /** Marca un expediente como eliminado (borrado lógico) y registra la acción en el log. */
     async deleteExpediente (id: number,user: number) {
         const sql = 'UPDATE public.glpi_sexp_expediente SET deleted = true WHERE exp_id = $1;'
         const log = `INSERT INTO public.glpi_sexp_expediente_log(exp_id, col, des,user_id) VALUES ($1, $2, $3, $4);`
@@ -83,6 +88,8 @@ export class ExpedienteService {
         await conn.end()
         return `Expediente eliminado.`
     }
+
+    /** Inserta un nuevo expediente y genera sus registros iniciales en los logs de auditoría y estados. */
     async createExpediente (exp: expedienteDto){
         const sql = `INSERT INTO public.glpi_sexp_expediente
         (service_id, user_id, numero_exp, concepto, periodo, 
@@ -103,6 +110,8 @@ export class ExpedienteService {
         await conn.query(logEst,[null,exp.estado_id,result,'NOW()'])
         await conn.end()
     }
+
+    /** Retorna el detalle completo de un expediente con su historial y actualiza su fecha de última visualización. */
     async getUniqExpediente (id: number) {
         const sql = `SELECT * FROM public.glpi_sexp_expediente WHERE exp_id = ${id};`
         const sqlHis = `SELECT l.*,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
@@ -117,6 +126,7 @@ export class ExpedienteService {
         return exps
     }
 
+    /** Obtiene los últimos 100 movimientos de auditoría registrados globalmente para todos los expedientes. */
     async getLastHistorial () {
         const sql = `SELECT l.*,e.numero_exp,e.concepto,u.first_name,u.last_name FROM public.glpi_sexp_expediente_log l 
         JOIN public.glpi_sexp_expediente e ON e.exp_id = l.exp_id
@@ -129,6 +139,7 @@ export class ExpedienteService {
         return exps
     }
 
+    /** Busca un expediente activo por su número oficial y retorna su ID. */
     async getByNro (nro: string) {
         const sql = `SELECT exp_id FROM public.glpi_sexp_expediente WHERE numero_exp = '${nro}' AND deleted = false;`
         const conn = clientReturner()
@@ -139,6 +150,7 @@ export class ExpedienteService {
         return exps
     }
 
+    /** Consulta la ubicación actual del expediente en el servicio web del Ministerio de Salud de Corrientes. */
     async getMinSaludApi (nro: string,httpService:HttpService) {
         const e = nro.slice(0,3)
         const n = nro.slice(3,8)
@@ -151,6 +163,7 @@ export class ExpedienteService {
         return decode(data["contenido"]["ubicacion"])
     }
 
+    /** Extrae mediante web scraping y expresiones regulares los datos del expediente en el Ministerio de Educación de Corrientes. */
     async getMinEduApi (nro: string,httpService:HttpService) {
         const repartic = nro.slice(0,3)
         const otros = nro.slice(3,8)
@@ -193,6 +206,7 @@ export class ExpedienteService {
         return response
     }
 
+    /** Consulta mediante web scraping los últimos movimientos de un expediente en el portal de Consulta de Trámites del Chaco. */
     async getMinChacoAPI (nro: string,httpService:HttpService) {
         interface MovimientoTramite {
             fecha: string;
@@ -247,6 +261,7 @@ export class ExpedienteService {
         return movs
     }
 
+    /** Consulta la información del expediente en la API de la Contaduría General de la Provincia de Corrientes. */
     async getContaduriaGralApi (nro: string,httpService:HttpService) {
         const httpsAgent = new https.Agent({
             rejectUnauthorized: false,
@@ -256,6 +271,7 @@ export class ExpedienteService {
         return data
     }
 
+    /** Retorna los números de expedientes activos aptos para ser sincronizados de forma masiva. */
     async getAllExpedientesForUpdate () {
         interface IExpedienteUpd {
             numero_exp: string
@@ -268,6 +284,7 @@ export class ExpedienteService {
         return exps.map(e => e.numero_exp)
     }
 
+    /** Sincroniza y actualiza en lote los datos externos (api1, api2 y diff) de los expedientes. */
     async massiveUpdate (httpService:HttpService,gral: updaterGral[]) {
         interface IExpRes {
             exp_id:number,
