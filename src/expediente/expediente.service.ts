@@ -306,14 +306,14 @@ export class ExpedienteService {
                 try {
                     if(ex.numero_exp.includes("-")) {
                         const res = await this.getMinChacoAPI(ex.numero_exp,httpService)
-                        if(res[0] !== ex.api1) {
+                        if(res[0] !== ex.api2) {
                             wasMod = true
-                            await conn.query(updaterAPI1,[ex.exp_id,res[0],wasMod])
-                            changes.push(ex.numero_exp+" ACTUALIZADO API 1 - "+dateNow)
+                            await conn.query(updaterAPI2,[ex.exp_id,res[0],wasMod])
+                            changes.push(ex.numero_exp+" ACTUALIZADO API 2 - "+dateNow)
                         }
                         else {
-                            await conn.query(updaterAPI1,[ex.exp_id,res[0],wasMod])
-                            changes.push(ex.numero_exp+" NO ACTUALIZADO API 1 - "+dateNow)
+                            await conn.query(updaterAPI2,[ex.exp_id,res[0],wasMod])
+                            changes.push(ex.numero_exp+" NO ACTUALIZADO API 2 - "+dateNow)
                         }
                     }
                     else {
